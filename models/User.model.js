@@ -25,6 +25,9 @@ const userSchema = new Schema(
       type: String,
       enum: ['male', 'female', 'non-binary', 'other', 'prefer-not-to-say'],
     },
+    nationality: {
+      type: String,
+    },
     profilePicture: {
       type: String,
       default: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Windows_10_Default_Profile_Picture.svg/2048px-Windows_10_Default_Profile_Picture.svg.png"

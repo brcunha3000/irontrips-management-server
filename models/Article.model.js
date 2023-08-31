@@ -13,6 +13,7 @@ const articleSchema = new Schema(
     cost: {
       type: String,
       enum: ["Budget-Friendly", "Moderate", "Expensive", "Luxury"],
+      required: true,
     },
     gallery: [{ type: String }],
     country: { type: Schema.Types.ObjectId, ref: "Country" },
@@ -24,6 +25,6 @@ const articleSchema = new Schema(
   }
 );
 
-const User = model("Article", articleSchema);
+const Article = model("Article", articleSchema);
 
-module.exports = User;
+module.exports = Article;

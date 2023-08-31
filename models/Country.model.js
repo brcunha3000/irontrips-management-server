@@ -20,6 +20,6 @@ const countrySchema = new Schema(
   }
 );
 
-const User = model("Country", countrySchema);
+const Country = model("Country", countrySchema);
 
-module.exports = User;
+module.exports = Country;
