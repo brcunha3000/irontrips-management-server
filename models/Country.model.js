@@ -1,16 +1,35 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model, SchemaType } = require("mongoose");
 
 const countrySchema = new Schema(
     {
-        name: { type: String },
+        name: {
+            common: {
+                type: String,
+            },
+        },
+
+        favorites: [{ type: Schema.Types.ObjectId, ref: "User" }],
+        cca2: { type: String },
+        cca3: { type: String },
         flag: { type: String },
-        flags: { type: String },
+        flags: {
+            png: {
+                type: String,
+            },
+            svg: {
+                type: String,
+            },
+        },
         region: { type: String },
-        capital: { type: String },
+        capital: [String],
         currencies: { type: String },
         languages: { type: String },
         area: { type: Number },
-        map: { type: String },
+        map: {
+            googleMaps: {
+                type: String,
+            },
+        },
         borders: [String],
         cities: [String],
         articles: { type: Schema.Types.ObjectId, ref: "Article" },

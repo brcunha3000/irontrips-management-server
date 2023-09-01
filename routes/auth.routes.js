@@ -73,6 +73,7 @@ router.post("/auth/signup", (req, res, next) => {
                 password: hashedPassword,
                 firstName,
                 lastName,
+                username,
             });
         })
         .then((createdUser) => {
