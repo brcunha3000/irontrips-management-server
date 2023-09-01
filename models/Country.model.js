@@ -8,7 +8,7 @@ const countrySchema = new Schema(
             },
         },
 
-        favorites: [{ type: Schema.Types.ObjectId, ref: "User" }],
+        favorites: { type: Number, default: 0 },
         cca2: { type: String },
         cca3: { type: String },
         flag: { type: String },

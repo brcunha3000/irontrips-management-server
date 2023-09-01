@@ -43,16 +43,23 @@ router.post("/addFavorites/:countryCode", async (req, res) => {
     /*  const currentUser = req.session.currentUser; */
     // Get country
     let foundCountry = await Country.findOne({ cca3: countryCode });
-    const thisUser = await User.findById("64f0ec79db7e8546e60b854d");
+    const thisUser = await User.findById("64f0cd0d4dd998b6120c21b9");
     const isFav = thisUser.favoritesCountries.includes(foundCountry._id);
+    let numLikes = foundCountry.favorites;
 
     try {
         if (!isFav) {
             thisUser.favoritesCountries.push(foundCountry._id);
-            /* foundCountry.favorites.push(thisUser._id); */
+            await Country.findByIdAndUpdate(foundCountry._id, {
+                favorites: numLikes + 1,
+            });
+            console.log("add");
         } else {
             thisUser.favoritesCountries.pull(foundCountry._id);
-            /* foundCountry.favorites.pull(thisUser._id); */
+            await Country.findByIdAndUpdate(foundCountry._id, {
+                favorites: numLikes - 1,
+            });
+            console.log("remove");
         }
         /* const favCountry = await User.findByIdAndUpdate(
             "64f0cd0d4dd998b6120c21b9",
@@ -60,6 +67,7 @@ router.post("/addFavorites/:countryCode", async (req, res) => {
                 $push: { favoritesCountries: idCountry },
             }
         ); */
+        console.log(numLikes);
         await thisUser.save();
 
         res.json(!isFav);
