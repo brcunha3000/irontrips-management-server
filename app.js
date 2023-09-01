@@ -21,6 +21,15 @@ app.use("/", indexRoutes);
 const authRoutes = require("./routes/auth.routes");
 app.use("/", authRoutes);
 
+const contactsRoutes = require("./routes/contacts.routes");
+app.use("/", contactsRoutes);
+
+const communityRoutes = require("./routes/community.routes");
+app.use("/", communityRoutes);
+
+const galleryRoutes = require("./routes/gallery.routes");
+app.use("/", galleryRoutes);
+
 const countryRoutes = require("./routes/country.routes");
 app.use("/theglobe", countryRoutes);
 
