@@ -30,6 +30,9 @@ app.use("/", communityRoutes);
 const galleryRoutes = require("./routes/gallery.routes");
 app.use("/", galleryRoutes);
 
+const profileRoutes = require("./routes/profile.routes");
+app.use("/", profileRoutes);
+
 const countryRoutes = require("./routes/country.routes");
 app.use("/theglobe", countryRoutes);
 
