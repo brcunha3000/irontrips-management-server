@@ -22,12 +22,10 @@ router.get("/:countryCode", async (req, res) => {
     /* const currentUser = req.session.currentUser;*/
 
     try {
-        let foundCountry = await Country.findOne({ cca3: countryCode });
+        let foundCountry = await Country.findOne({ cca2: countryCode });
         const thisUser = await User.findById("64f0cd0d4dd998b6120c21b9");
 
         foundCountry.populate("articles");
-
-        console.log(foundCountry.favorites);
 
         /* await thisUser.save();
         foundCountry = { ...foundCountry.toObject(), isFav }; */
