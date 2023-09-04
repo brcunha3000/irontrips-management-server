@@ -56,6 +56,12 @@ const userSchema = new Schema(
                 ref: "Country",
             },
         ],
+        pendingCountries: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "Country",
+            },
+        ],
         articles: [
             {
                 type: Schema.Types.ObjectId,
