@@ -10,8 +10,8 @@ router.get("/user-profile", isAuthenticated, async (req, res) => {
         const user = req.payload;
 
         const thisUser = await User.findById(user._id)
-            .populate("visitedCountries")
             .populate("favoritesCountries")
+            .populate("visitedCountries")
             .populate("pendingCountries")
             .populate({
                 path: "articles",
@@ -45,7 +45,7 @@ router.put("/user-profile", isAuthenticated, async (req, res) => {
     }
 });
 
-// DELETE route to delete a Project
+// DELETE route to delete a user
 router.delete("/user-profile", isAuthenticated, async (req, res) => {
     const user = req.payload;
 
@@ -59,44 +59,51 @@ router.delete("/user-profile", isAuthenticated, async (req, res) => {
 
 // Create new Article
 router.post("/user-profile/newArticle", isAuthenticated, async (req, res) => {
+    const thisUser = req.payload;
+    const user = thisUser._id;
+
+    console.log(req.body);
+
+    const { generalComment, review, overall, cost, gallery, countryCode } =
+        req.body;
+
+    let foundCountry = await Country.findOne({ cca2: countryCode });
+
     try {
-        const thisUser = req.payload;
-        const user = thisUser._id;
+        // Falta adicionar o country code
+        // Create a new Article
+        let newArticle = await Article.create({
+            generalComment,
+            review,
+            overall,
+            cost,
+            gallery,
+        });
+        // Add artcile to User
+        await User.findByIdAndUpdate(user, {
+            $push: { articles: newArticle._id },
+        });
 
-        const { generalComment, review, overall, cost, gallery, countryCode } =
-            req.body;
+        await Article.findByIdAndUpdate(newArticle._id, {
+            $push: { user: user, country: foundCountry._id },
+        });
 
-        let foundCountry = await Country.findOne({ cca2: countryCode });
-        try {
-            // Falta adicionar o country code
-            // Create a new Article
-            let newArticle = await Article.create({
-                generalComment,
-                review,
-                overall,
-                cost,
-                gallery,
-            });
-            // Add artcile to User
-            await User.findByIdAndUpdate(user, {
-                $push: { articles: newArticle._id },
-            });
-
-            await Article.findByIdAndUpdate(newArticle._id, {
-                $push: { user: user },
-            });
-            await Article.findByIdAndUpdate(newArticle._id, {
-                $push: { country: foundCountry._id },
-            });
-
-            await Country.findByIdAndUpdate(foundCountry._id, {
-                $push: { articles: newArticle._id },
-            });
-        } catch (error) {
-            res.json(error);
-        }
-
+        await Country.findByIdAndUpdate(foundCountry._id, {
+            $push: { articles: newArticle._id },
+        });
         res.json(user);
+    } catch (error) {
+        res.json(error);
+    }
+});
+
+// DELETE route to delete a Project
+router.delete("/user-profile/:articleId", async (req, res) => {
+    const { articleId } = req.params;
+
+    try {
+        await Article.findByIdAndDelete(articleId);
+        res.json({ message: "articleId deleted" });
     } catch (error) {
         res.json(error);
     }
