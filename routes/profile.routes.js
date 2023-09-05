@@ -9,9 +9,17 @@ router.get("/user-profile", isAuthenticated, async (req, res) => {
     try {
         const user = req.payload;
 
-        const thisUser = await User.findById(user._id).populate(
-            "visitedCountries"
-        );
+        const thisUser = await User.findById(user._id)
+            .populate("visitedCountries")
+            .populate("favoritesCountries")
+            .populate("pendingCountries")
+            .populate({
+                path: "articles",
+                populate: {
+                    path: "country",
+                    model: "Country",
+                },
+            });
 
         res.json(thisUser);
     } catch (error) {

@@ -74,4 +74,38 @@ router.post("/addFavorites/:countryCode", isAuthenticated, async (req, res) => {
     }
 });
 
+// Visited Country action
+router.post("/addVisited/:countryCode", isAuthenticated, async (req, res) => {
+    const { countryCode } = req.params;
+    // User
+    const thisUser = req.payload;
+    const currentUser = await User.findById(thisUser._id);
+    // Get country
+    let foundCountry = await Country.findOne({ cca2: countryCode });
+    const isVisited = currentUser.visitedCountries.includes(foundCountry._id);
+
+    try {
+        if (!isVisited) {
+            currentUser.visitedCountries.push(foundCountry._id);
+            await Country.findByIdAndUpdate(foundCountry._id, {});
+            //console.log("add");
+        } else {
+            currentUser.visitedCountries.pull(foundCountry._id);
+            await Country.findByIdAndUpdate(foundCountry._id, {});
+            //console.log("remove");
+        }
+        /* const favCountry = await User.findByIdAndUpdate(
+            "64f0cd0d4dd998b6120c21b9",
+            {
+                $push: { favoritesCountries: idCountry },
+            }
+        ); */
+        await currentUser.save();
+
+        res.json(!isVisited);
+    } catch (error) {
+        res.json(error);
+    }
+});
+
 module.exports = router;
