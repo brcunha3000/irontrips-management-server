@@ -32,7 +32,7 @@ const countrySchema = new Schema(
         },
         borders: [String],
         cities: [String],
-        articles: { type: Schema.Types.ObjectId, ref: "Article" },
+        articles: [{ type: Schema.Types.ObjectId, ref: "Article" }],
     },
     {
         timestamps: true,

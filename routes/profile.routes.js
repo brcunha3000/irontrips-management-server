@@ -1,46 +1,66 @@
 const express = require("express");
 const Article = require("../models/Article.model");
 const User = require("../models/User.model");
+const Country = require("../models/Country.model");
 const router = express.Router();
-
-router.get("/user-profile", async (req, res) => {
+const { isAuthenticated } = require("../middleware/jwt.middleware");
+// Get information
+router.get("/user-profile", isAuthenticated, async (req, res) => {
     try {
-        /* const user = req.session.currentUser;
-         */
-        const idTeste = "64f0ec79db7e8546e60b854d";
-        const user = await User.findById(idTeste);
+        const user = req.payload;
 
-        //console.log(user);
+        const thisUser = await User.findById(user._id).populate(
+            "visitedCountries"
+        );
 
-        res.json(user);
+        res.json(thisUser);
+    } catch (error) {
+        res.json(error);
+    }
+});
+
+// Edit information
+router.put("/user-profile", isAuthenticated, async (req, res) => {
+    const user = req.payload;
+
+    const { firstName, lastName, email } = req.body;
+
+    try {
+        let updateProfile = await User.findByIdAndUpdate(
+            user._id,
+            { firstName, lastName, email },
+            { new: true }
+        );
+        res.json(updateProfile);
+    } catch (error) {
+        res.json(error);
+    }
+});
+
+// DELETE route to delete a Project
+router.delete("/user-profile", isAuthenticated, async (req, res) => {
+    const user = req.payload;
+
+    try {
+        await User.findByIdAndRemove(user._id);
+        res.json({ message: "User deleted" });
     } catch (error) {
         res.json(error);
     }
 });
 
 // Create new Article
-router.post("/user-profile/create", async (req, res) => {
+router.post("/user-profile/newArticle", isAuthenticated, async (req, res) => {
     try {
-        /* const user = req.session.currentUser;
-         */
-        /* const currentUser = await User.findById(idTeste); */
+        const thisUser = req.payload;
+        const user = thisUser._id;
 
-        // Testes
-        const currentUser = "64f0ec79db7e8546e60b854d";
+        const { generalComment, review, overall, cost, gallery, countryCode } =
+            req.body;
 
-        //console.log(user);
-
-        const {
-            generalComment,
-            review,
-            overall,
-            cost,
-            gallery,
-            country,
-            user,
-        } = req.body;
-
+        let foundCountry = await Country.findOne({ cca2: countryCode });
         try {
+            // Falta adicionar o country code
             // Create a new Article
             let newArticle = await Article.create({
                 generalComment,
@@ -48,18 +68,27 @@ router.post("/user-profile/create", async (req, res) => {
                 overall,
                 cost,
                 gallery,
-                country,
-                user,
             });
             // Add artcile to User
-            await User.findByIdAndUpdate(currentUser, {
+            await User.findByIdAndUpdate(user, {
+                $push: { articles: newArticle._id },
+            });
+
+            await Article.findByIdAndUpdate(newArticle._id, {
+                $push: { user: user },
+            });
+            await Article.findByIdAndUpdate(newArticle._id, {
+                $push: { country: foundCountry._id },
+            });
+
+            await Country.findByIdAndUpdate(foundCountry._id, {
                 $push: { articles: newArticle._id },
             });
         } catch (error) {
-            res.json(currentUser);
+            res.json(error);
         }
 
-        res.json(currentUser);
+        res.json(user);
     } catch (error) {
         res.json(error);
     }

@@ -5,6 +5,7 @@ const router = express.Router();
 const Country = require("../models/Country.model");
 const User = require("../models/User.model");
 const Article = require("../models/Article.model");
+const { isAuthenticated } = require("../middleware/jwt.middleware");
 
 // Get Route that gets all the project
 router.get("/countries", async (req, res) => {
@@ -23,7 +24,6 @@ router.get("/:countryCode", async (req, res) => {
 
     try {
         let foundCountry = await Country.findOne({ cca2: countryCode });
-        const thisUser = await User.findById("64f0cd0d4dd998b6120c21b9");
 
         foundCountry.populate("articles");
 
@@ -36,28 +36,29 @@ router.get("/:countryCode", async (req, res) => {
 });
 
 // Favourite Country action
-router.post("/addFavorites/:countryCode", async (req, res) => {
+router.post("/addFavorites/:countryCode", isAuthenticated, async (req, res) => {
     const { countryCode } = req.params;
-    /*  const currentUser = req.session.currentUser; */
+    // User
+    const thisUser = req.payload;
+    const currentUser = await User.findById(thisUser._id);
     // Get country
-    let foundCountry = await Country.findOne({ cca3: countryCode });
-    const thisUser = await User.findById("64f0cd0d4dd998b6120c21b9");
-    const isFav = thisUser.favoritesCountries.includes(foundCountry._id);
+    let foundCountry = await Country.findOne({ cca2: countryCode });
+    const isFav = currentUser.favoritesCountries.includes(foundCountry._id);
     let numLikes = foundCountry.favorites;
 
     try {
         if (!isFav) {
-            thisUser.favoritesCountries.push(foundCountry._id);
+            currentUser.favoritesCountries.push(foundCountry._id);
             await Country.findByIdAndUpdate(foundCountry._id, {
                 favorites: numLikes + 1,
             });
-            console.log("add");
+            //console.log("add");
         } else {
-            thisUser.favoritesCountries.pull(foundCountry._id);
+            currentUser.favoritesCountries.pull(foundCountry._id);
             await Country.findByIdAndUpdate(foundCountry._id, {
                 favorites: numLikes - 1,
             });
-            console.log("remove");
+            //console.log("remove");
         }
         /* const favCountry = await User.findByIdAndUpdate(
             "64f0cd0d4dd998b6120c21b9",
@@ -65,8 +66,7 @@ router.post("/addFavorites/:countryCode", async (req, res) => {
                 $push: { favoritesCountries: idCountry },
             }
         ); */
-        console.log(numLikes);
-        await thisUser.save();
+        await currentUser.save();
 
         res.json(!isFav);
     } catch (error) {
