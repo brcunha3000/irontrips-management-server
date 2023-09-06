@@ -62,8 +62,6 @@ router.post("/user-profile/newArticle", isAuthenticated, async (req, res) => {
     const thisUser = req.payload;
     const user = thisUser._id;
 
-    console.log(req.body);
-
     const { generalComment, review, overall, cost, gallery, countryCode } =
         req.body;
 
@@ -97,8 +95,8 @@ router.post("/user-profile/newArticle", isAuthenticated, async (req, res) => {
     }
 });
 
-// DELETE route to delete a Project
-router.delete("/user-profile/:articleId", async (req, res) => {
+// Delete article
+router.delete("/editArticle/:articleId", async (req, res) => {
     const { articleId } = req.params;
 
     try {
@@ -109,11 +107,23 @@ router.delete("/user-profile/:articleId", async (req, res) => {
     }
 });
 
-// Edit Article
-router.put("/user-profile/:articleId", async (req, res) => {
+// Get information about article
+router.get("/editArticle/:articleId", async (req, res) => {
     const { articleId } = req.params;
-    const { generalComment, review, overall, cost, gallery, country, user } =
-        req.body;
+
+    try {
+        const article = await Article.findById(articleId).populate("country");
+
+        res.json(article);
+    } catch (error) {
+        res.json(error);
+    }
+});
+
+// Edit Article
+router.put("/editArticle/:articleId", async (req, res) => {
+    const { articleId } = req.params;
+    const { generalComment, review, overall, cost, gallery } = req.body;
 
     try {
         let updateArticle = await Article.findByIdAndUpdate(
@@ -124,8 +134,6 @@ router.put("/user-profile/:articleId", async (req, res) => {
                 overall,
                 cost,
                 gallery,
-                country,
-                user,
             },
             { new: true }
         );
