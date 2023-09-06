@@ -182,7 +182,7 @@ router.get("/logout", (req, res) => {
             });
             return;
         }
-        res.redirect("/home");
+        res.redirect("/");
     });
 });
 
