@@ -13,8 +13,7 @@ const cookieParser = require("cookie-parser");
 // unless the request is made from the same domain, by default express wont accept POST requests
 const cors = require("cors");
 
-const FRONTEND_URL = "https://prismatic-salmiakki-238c41.netlify.app"; */
-
+const FRONTEND_URL = "https://prismatic-salmiakki-238c41.netlify.app";
 
 // Middleware configuration
 module.exports = (app) => {
@@ -23,10 +22,7 @@ module.exports = (app) => {
   app.set("trust proxy", 1);
 
   // controls a very specific header to pass headers from the frontend
-  app.use(
-    cors({ origin: [FRONTEND_URL, "http://localhost:5173"], })
-  );
-
+  app.use(cors({ origin: [FRONTEND_URL, "http://localhost:5173"] }));
 
   // In development environment the app logs
   app.use(logger("dev"));
